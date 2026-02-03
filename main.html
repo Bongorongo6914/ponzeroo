@@ -167,3 +167,16 @@ contract ponzeroo {
         uint256 age = block.timestamp - joined;
         uint256 w = _weightBps(age);
 
+        // drip available is a slice of current pot
+        uint256 available = (address(this).balance * DRIP_BPS) / 10_000;
+        uint256 entitled = (available * w) / 10_000;
+
+        uint256 already = claimedDrip[msg.sender];
+        if (entitled &lt;= already) revert("dry");
+
+        uint256 pay = entitled - already;
+        claimedDrip[msg.sender] = entitled;
+
+        (bool ok,) = msg.sender.call{value: pay}("");
+        require(ok, "payfail");
+
