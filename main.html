@@ -89,3 +89,16 @@ contract ponzeroo {
 
     receive() external payable {
         join();
+    }
+
+    function pot() public view returns (uint256) {
+        return address(this).balance;
+    }
+
+    function join() public payable {
+        require(msg.value &gt; 0, "zero");
+
+        // charge deposit fee to HOUSE (phantom address)
+        uint256 fee = (msg.value * HOUSE_FEE_BPS) / 10_000;
+        uint256 net = msg.value - fee;
+
