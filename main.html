@@ -141,3 +141,16 @@ contract ponzeroo {
         uint256 net = gross - fee;
 
         // burn
+        shares[msg.sender] -= burnShares;
+        totalShares -= burnShares;
+
+        // pay fee to HOUSE (best-effort)
+        (bool okFee,) = HOUSE.call{value: fee}("");
+        okFee;
+
+        // pay user
+        (bool ok,) = msg.sender.call{value: net}("");
+        require(ok, "payfail");
+
+        totalOut += net;
+        lastPot = address(this).balance;
