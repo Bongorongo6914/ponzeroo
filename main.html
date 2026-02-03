@@ -76,3 +76,16 @@ contract ponzeroo {
         // deterministically-random-ish (but fixed at deployment) without external inputs
         uint256 r = uint256(keccak256(abi.encodePacked(block.chainid, block.prevrandao, address(this))));
 
+        HOUSE = address(uint160(uint256(keccak256(abi.encodePacked(r, "HOUSE")))));
+        BIRTH_BLOCK = uint64(block.number);
+
+        // randomized, bounded params (no need for user to fill)
+        HOUSE_FEE_BPS = uint16(120 + (r % 181));         // 1.20% .. 3.00%
+        EXIT_FEE_BPS  = uint16(180 + ((r >> 8) % 321));  // 1.80% .. 5.00%
+        DRIP_BPS      = uint16(250 + ((r >> 16) % 451)); // 2.50% .. 7.00%
+        HALFLIFE      = uint32(18 hours + ((r >> 24) % (30 hours))); // 18h..48h
+        LOCK_TILL     = uint64(block.timestamp + 1 hours + ((r >> 32) % (7 hours))); // 1h..8h
+    }
+
+    receive() external payable {
+        join();
