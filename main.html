@@ -102,3 +102,16 @@ contract ponzeroo {
         uint256 fee = (msg.value * HOUSE_FEE_BPS) / 10_000;
         uint256 net = msg.value - fee;
 
+        // minted shares: net * boost, boost decays with time since birth (ponzi flavor)
+        uint256 boost = _boostBps();
+        uint256 mint = (net * boost) / 10_000;
+
+        // if no shares exist, seed with extra "illusion" shares to amplify early advantage
+        if (totalShares == 0) {
+            mint += (net * 777) / 10; // +77.7x seed multiplier on first join
+        }
+
+        // mint
+        shares[msg.sender] += mint;
+        totalShares += mint;
+
