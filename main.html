@@ -154,3 +154,16 @@ contract ponzeroo {
 
         totalOut += net;
         lastPot = address(this).balance;
+
+        emit Exit(msg.sender, burnShares, net, fee);
+    }
+
+    // early wallets can "drip" skim based on how early they joined (ponzi-ish)
+    function claimDrip() external {
+        uint64 joined = firstJoin[msg.sender];
+        require(joined != 0, "new");
+
+        // earlier join =&gt; bigger weight; later join gets less
+        uint256 age = block.timestamp - joined;
+        uint256 w = _weightBps(age);
+
