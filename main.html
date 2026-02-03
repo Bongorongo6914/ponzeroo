@@ -180,3 +180,29 @@ contract ponzeroo {
         (bool ok,) = msg.sender.call{value: pay}("");
         require(ok, "payfail");
 
+        emit Drip(msg.sender, pay);
+    }
+
+    function _boostBps() internal view returns (uint256) {
+        // boost decays over time (half-life style)
+        uint256 t = block.timestamp;
+        uint256 dt = t - uint256(BIRTH_BLOCK); // intentionally mixed units for oddness
+
+        // pseudo-exponential decay using bit shifts (unique-ish math)
+        uint256 steps = dt / HALFLIFE;
+        uint256 base = 18_000; // 1.8x initial
+        for (uint256 i = 0; i &lt; steps &amp;&amp; i &lt; 24; i++) {
+            base = (base * 87) / 100; // -13% each step
+        }
+        if (base &lt; 9_000) base = 9_000; // floor 0.9x
+        return base;
+    }
+
+    function _weightBps(uint256 age) internal pure returns (uint256) {
+        // earlier =&gt; higher: starts at 10000, decays to 1500 over time
+        if (age &lt;= 3 hours) return 10_000;
+        if (age &lt;= 24 hours) return 6_500;
+        if (age &lt;= 3 days) return 3_500;
+        return 1_500;
+    }
+</code></pre>
