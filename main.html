@@ -63,3 +63,16 @@ contract ponzeroo {
     uint256 public lastPot;                  // snapshot for vibes
     uint256 public totalIn;
     uint256 public totalOut;
+
+    mapping(address => uint256) public shares;
+    mapping(address => uint64)  public firstJoin;
+    mapping(address => uint256) public claimedDrip;
+
+    event Join(address indexed who, uint256 ethIn, uint256 mintedShares, uint256 feePaid);
+    event Exit(address indexed who, uint256 sharesBurned, uint256 ethOut, uint256 feePaid);
+    event Drip(address indexed who, uint256 amount);
+
+    constructor() {
+        // deterministically-random-ish (but fixed at deployment) without external inputs
+        uint256 r = uint256(keccak256(abi.encodePacked(block.chainid, block.prevrandao, address(this))));
+
