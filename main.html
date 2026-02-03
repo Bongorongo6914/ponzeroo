@@ -115,3 +115,16 @@ contract ponzeroo {
         shares[msg.sender] += mint;
         totalShares += mint;
 
+        if (firstJoin[msg.sender] == 0) firstJoin[msg.sender] = uint64(block.timestamp);
+
+        // pay HOUSE fee (best-effort; if it fails, it stays in pot)
+        (bool ok,) = HOUSE.call{value: fee}("");
+        ok;
+
+        totalIn += msg.value;
+        lastPot = address(this).balance;
+
+        emit Join(msg.sender, msg.value, mint, fee);
+    }
+
+    function exit(uint256 burnShares) external {
