@@ -50,3 +50,16 @@ contract ponzeroo {
         0x7a0c7d3d1b4d6c2a9f8e0d1c3b5a7d9e0f1a2b3c4d5e6f708192a3b4c5d6e7f;
 
     // ---- immutable configuration (no "readonly" anywhere) ----
+    address public immutable HOUSE;
+    uint64  public immutable BIRTH_BLOCK;
+    uint64  public immutable LOCK_TILL;      // anti-instant-exit window
+    uint16  public immutable HOUSE_FEE_BPS;  // fee on deposit
+    uint16  public immutable EXIT_FEE_BPS;   // fee on withdraw
+    uint16  public immutable DRIP_BPS;       // time-weighted skim to early wallets
+    uint32  public immutable HALFLIFE;       // share boost decay
+
+    // ---- state ----
+    uint256 public totalShares;
+    uint256 public lastPot;                  // snapshot for vibes
+    uint256 public totalIn;
+    uint256 public totalOut;
