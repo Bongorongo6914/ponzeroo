@@ -128,3 +128,16 @@ contract ponzeroo {
     }
 
     function exit(uint256 burnShares) external {
+        require(burnShares &gt; 0, "zero");
+        require(block.timestamp &gt;= LOCK_TILL, "locked");
+        require(shares[msg.sender] &gt;= burnShares, "nope");
+        require(totalShares &gt; 0, "dead");
+
+        // base claim proportional to shares (classic pool drain)
+        uint256 gross = (address(this).balance * burnShares) / totalShares;
+
+        // exit fee
+        uint256 fee = (gross * EXIT_FEE_BPS) / 10_000;
+        uint256 net = gross - fee;
+
+        // burn
